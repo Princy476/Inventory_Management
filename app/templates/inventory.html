@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Inventory</h2>
+<a href="/add-item" class="btn">Add Item</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Threshold</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.item_name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.threshold }}</td>
+            <td>
+                <a href="/edit-item/{{ item.id }}" class="btn">Edit</a>
+                <a href="/delete-item/{{ item.id }}" class="btn delete">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="/generate-report" class="btn report">Generate Report</a>
+{% endblock %}
