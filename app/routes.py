@@ -1,68 +1,82 @@
-from flask import Flask, render_template, request, redirect, url_for, flash  # Added flash for notifications
+from flask import Flask, render_template, request, redirect, url_for, flash
 from app.database import get_items, add_item, update_item, delete_item
 from app.email_notification import send_email_notification
 from app.scheduler import schedule_report
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Set a secret key for session management
+app.secret_key = 'your_secret_key'
 
 @app.route('/')
 def index():
-    items = get_items()  # Fetch items from the database
-    return render_template('inventory.html', items=items)  # Render inventory page with items
+    items = get_items()
+    return render_template('inventory.html', items=items)
 
 @app.route('/add-item', methods=['GET', 'POST'])
 def add_item_route():
     if request.method == 'POST':
-        item_name = request.form.get('item_name')  # Use get to avoid KeyError
-        quantity = request.form.get('item_quantity')  # Use get to avoid KeyError
-        item_description = request.form.get('item_description')  # Use get to avoid KeyError
-        
-        # Input validation
-        if not item_name or not quantity or not item_description:
-            flash('All fields are required!', 'danger')  # Flash error if inputs are invalid
-            return redirect(url_for('add_item_route'))  # Redirect to add item page
+        item_name = request.form.get('item_name')
+        quantity = request.form.get('item_quantity')
+        threshold = request.form.get('item_threshold')
+        item_description = request.form.get('item_description')
 
-        # Add item to the database
-        add_item(item_name, quantity, item_description)
-        flash('Item added successfully!', 'success')  # Flash success message
-        return redirect(url_for('index'))  # Redirect to index page
+        # Input validation to ensure all fields are filled
+        if not item_name or not quantity or not threshold or not item_description:
+            flash('All fields are required!', 'danger')
+            return redirect(url_for('add_item_route'))
 
-    return render_template('add_item.html')  # Render the add item form
+        # Convert quantity and threshold to integers
+        try:
+            quantity = int(quantity)
+            threshold = int(threshold)
+        except ValueError:
+            flash('Quantity and Threshold must be numbers!', 'danger')
+            return redirect(url_for('add_item_route'))
+
+        add_item(item_name, quantity, threshold)  # Add item to the database
+        flash('Item added successfully!', 'success')
+        return redirect(url_for('index'))
+
+    return render_template('add_item.html')
 
 @app.route('/edit-item/<int:item_id>', methods=['GET', 'POST'])
 def edit_item_route(item_id):
     if request.method == 'POST':
-        item_name = request.form.get('item_name')  # Use get to avoid KeyError
-        quantity = request.form.get('item_quantity')  # Use get to avoid KeyError
-        item_description = request.form.get('item_description')  # Use get to avoid KeyError
+        item_name = request.form.get('item_name')
+        quantity = request.form.get('item_quantity')
+        threshold = request.form.get('item_threshold')
+        
+        # Input validation to ensure all fields are filled
+        if not item_name or not quantity or not threshold:
+            flash('All fields are required!', 'danger')
+            return redirect(url_for('edit_item_route', item_id=item_id))
 
-        # Input validation
-        if not item_name or not quantity or not item_description:
-            flash('All fields are required!', 'danger')  # Flash error if inputs are invalid
-            return redirect(url_for('edit_item_route', item_id=item_id))  # Redirect to edit page
+        # Convert quantity and threshold to integers
+        try:
+            quantity = int(quantity)
+            threshold = int(threshold)
+        except ValueError:
+            flash('Quantity and Threshold must be numbers!', 'danger')
+            return redirect(url_for('edit_item_route', item_id=item_id))
+        
+        update_item(item_id, item_name, quantity, threshold)  # Update item in the database
+        flash('Item updated successfully!', 'success')
+        return redirect(url_for('index'))
 
-        # Update item in the database
-        update_item(item_id, item_name, quantity, item_description)
-        flash('Item updated successfully!', 'success')  # Flash success message
-        return redirect(url_for('index'))  # Redirect to index page
-
-    # If GET request, fetch the item to edit
-    item = get_item(item_id)  # Ensure you have a function to fetch an item by ID
-    return render_template('edit_item.html', item=item)  # Render the edit item form
+    item = [item for item in get_items() if item['id'] == item_id][0]
+    return render_template('edit_item.html', item=item)
 
 @app.route('/delete-item/<int:item_id>')
 def delete_item_route(item_id):
-    delete_item(item_id)  # Delete the item with the given ID from the database
-    flash('Item deleted successfully!', 'success')  # Flash success message
-    return redirect(url_for('index'))  # Redirect back to index
+    delete_item(item_id)  # Delete item from the database
+    flash('Item deleted successfully!', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/generate-report')
 def generate_report_route():
-    send_email_notification()  # Trigger report generation and email notification
-    flash('Report generated and email sent.', 'info')  # Inform user about the action
-    return redirect(url_for('index'))  # Redirect back to index
+    message = send_email_notification()  # Generate report and send email notification
+    flash(message, 'info')
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    schedule_report()  # Schedule any periodic tasks if needed
-    app.run(debug=True)  # Run the application in debug mode
+    schedule_report()  # Schedule report generation
+    app.run(debug=True)

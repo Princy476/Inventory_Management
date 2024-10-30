@@ -2,14 +2,13 @@ import sqlite3
 
 # Function to connect to the database
 def get_db_connection():
-    conn = sqlite3.connect('inventory.db')  # Creates 'inventory.db' in the current folder if not present
-    conn.row_factory = sqlite3.Row  # This will return rows as dictionaries
+    conn = sqlite3.connect('inventory.db')
+    conn.row_factory = sqlite3.Row
     return conn
 
 # Function to initialize the database
 def initialize_db():
     conn = get_db_connection()
-    # Create table if it doesn't exist
     conn.execute('''
         CREATE TABLE IF NOT EXISTS inventory (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,9 +33,12 @@ def add_item(item_name, quantity, threshold):
     conn.commit()
     conn.close()
 
-def update_item(item_id, quantity, threshold):
-    # Update item logic
-    pass
+def update_item(item_id, item_name, quantity, threshold):
+    conn = get_db_connection()
+    conn.execute('UPDATE inventory SET item_name = ?, quantity = ?, threshold = ? WHERE id = ?', 
+                 (item_name, quantity, threshold, item_id))
+    conn.commit()
+    conn.close()
 
 def delete_item(item_id):
     conn = get_db_connection()
