@@ -2,33 +2,40 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.database import get_items
+import requests
+import json
 
 def send_email_notification():
     items = get_items()
-    low_stock_items = [item for item in items if item['quantity'] < item['threshold']]
+    low_stock_items = [
+        {
+            "item_name": item['item_name'],
+            "available_quantity": item['quantity'],
+            "low_quantity_threshold": item['threshold']
+        }
+        for item in items if item['quantity'] < item['threshold']
+    ]
     
     if low_stock_items:
-        sender_email = "sprincy476@gmail.com"
-        receiver_email = "rathi.princy93@gmail.com"
-        password = "Jatin@12345"
-        
-        message = MIMEMultipart("alternative")
-        message["Subject"] = "Low Stock Alert"
-        message["From"] = sender_email
-        message["To"] = receiver_email
-        
-        body = "The following items are low in stock:\n\n"
-        for item in low_stock_items:
-            body += f"Item: {item['item_name']}, Quantity: {item['quantity']}\n"
-        
-        message.attach(MIMEText(body, "plain"))
-        
-        try:
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-                server.login(sender_email, password)
-                server.sendmail(sender_email, receiver_email, message.as_string())
-            return "Email sent successfully!"  # Success message
-        except smtplib.SMTPException as e:
-            return f"Error sending email: {str(e)}"  # Specific error message
+        # Define the JSON payload for the Logic App
+        payload = {
+            "subject": "Low Stock Alert",
+            "items": low_stock_items
+        }
+
+        # Replace this URL with the HTTP POST URL of your Logic App
+        logic_app_url = "https://YOUR_LOGIC_APP_URL"
+
+        # Send a POST request to your Logic App
+        response = requests.post(
+            logic_app_url,
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(payload)
+        )
+
+        if response.status_code == 200:
+            return "Email request sent successfully!"
+        else:
+            return f"Failed to send email request: {response.text}"
     else:
         return "No low stock items to notify."
