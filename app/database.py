@@ -22,17 +22,10 @@ def initialize_db():
 
 def get_items():
     conn = get_db_connection()
-    rows = conn.execute('SELECT * FROM inventory').fetchall()
+    items = conn.execute('SELECT * FROM inventory').fetchall()
     
     # Assuming the inventory table has item_name, quantity, and threshold columns
-    items = [
-        {
-            "item_name": row['item_name'],
-            "quantity": row['quantity'],
-            "threshold": row['threshold']
-        }
-        for row in rows
-    ]
+    
     
     conn.close()
     return items
