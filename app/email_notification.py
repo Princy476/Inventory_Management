@@ -24,8 +24,9 @@ def send_email_notification():
         }
 
         # Replace this URL with the HTTP POST URL of your Logic App
-        logic_app_url = "https://prod-21.northcentralus.logic.azure.com:443/workflows/171a90d58cba404dac5b2f943e099c5c/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=HEBpFQZa0jK-pZBaTpsumdwNMtQshWhwL0kjAIxyM08"
+        # logic_app_url = "https://prod-21.northcentralus.logic.azure.com:443/workflows/171a90d58cba404dac5b2f943e099c5c/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=HEBpFQZa0jK-pZBaTpsumdwNMtQshWhwL0kjAIxyM08"
 
+        logic_app_url = "https://prod-07.northcentralus.logic.azure.com:443/workflows/e2aff48826054efc8e2ba9fd00aa2d7f/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=oO8rIvfF7saWtNoBXSh7DkWDL6LnCNnyjwiGde33bOM"
         try:
             # Send a POST request to your Logic App
             response = requests.post(
