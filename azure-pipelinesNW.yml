@@ -42,4 +42,4 @@ jobs:
       appType: 'webApp'
       WebAppName: 'Inventorydbu'
       package: '$(Pipeline.Workspace)/appArtifact/*.zip'
-      enableCustomDeployment: true
+      enableCustomDeployment: true
