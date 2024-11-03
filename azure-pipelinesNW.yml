@@ -1,0 +1,45 @@
+trigger:
+  branches:
+    include:
+      - main  # Replace with your main branch name if different
+
+pool:
+  name: 'Self-Hosted-Agent-Pool'  # Replace with your self-hosted agent pool name
+
+variables:
+  pythonVersion: '3.10'  # Specify your Python version
+
+jobs:
+- job: BuildAndDeploy
+  displayName: 'Build and Deploy Inventory Management Application'
+  steps:
+
+  - checkout: self
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(pythonVersion)'
+      addToPath: true
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: |
+      python run.py
+    displayName: 'Run the application'
+    
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Pipeline.Workspace)/app'  # Adjust as necessary
+      artifact: 'appArtifact'
+      publishLocation: 'pipeline'
+
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'Azure subscription 1 (145b29a3-be32-4c17-ad9c-8f8fb02b04a3)'
+      appType: 'webApp'
+      WebAppName: 'Inventorydbu'
+      package: '$(Pipeline.Workspace)/appArtifact/*.zip'
+      enableCustomDeployment: true
