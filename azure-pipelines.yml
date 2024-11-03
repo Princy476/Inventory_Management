@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: 'Self-Hosted-Agent-Pool'  # Update to your self-hosted agent pool name
 
 steps:
 - script: echo Hello, world!
