@@ -12,30 +12,34 @@ pool:
 variables:
   pythonVersion: '3.12'  # Use the version that matches your Flask app
 
-# Steps section to define the build and deployment process
-steps:
-  # Step 1: Install Python and dependencies
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(pythonVersion)'
-      addToPath: true
+# Define jobs section with a single job to avoid parallelism
+jobs:
+- job: BuildAndDeploy  # Name of the job
+  displayName: 'Build and Deploy Job'
+  
+  steps:
+    # Step 1: Install Python and dependencies
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+        addToPath: true
 
-  - script: |
-      python -m venv env
-      source env/bin/activate
-      pip install -r requirements.txt
-    displayName: 'Install Dependencies'
+    - script: |
+        python -m venv env
+        source env/bin/activate
+        pip install -r requirements.txt
+      displayName: 'Install Dependencies'
 
-  # Step 2: Run Tests (if you have test scripts defined)
-  - script: |
-      source env/bin/activate
-      python -m unittest discover -s tests  # Adjust if needed for your tests
-    displayName: 'Run Tests'
+    # Step 2: Run Tests (if you have test scripts defined)
+    - script: |
+        source env/bin/activate
+        python -m unittest discover -s tests  # Adjust if needed for your tests
+      displayName: 'Run Tests'
 
-  # Step 3: Deploy to Azure Web App
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: 'MyAzureSubscriptionConnection'  # Replace with your actual service connection name
-      appName: 'Inventorydbu'  # Replace with your actual Azure Web App name
-      package: '$(Build.ArtifactStagingDirectory)/*.zip'
-    displayName: 'Deploy to Azure Web App'
+    # Step 3: Deploy to Azure Web App
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'MyAzureSubscriptionConnection'  # Replace with your actual service connection name
+        appName: 'Inventorydbu'  # Replace with your actual Azure Web App name
+        package: '$(Build.ArtifactStagingDirectory)/*.zip'
+      displayName: 'Deploy to Azure Web App'
