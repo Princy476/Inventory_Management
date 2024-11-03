@@ -7,7 +7,7 @@ pool:
   name: 'Self-Hosted-Agent-Pool'  # Replace with your self-hosted agent pool name
 
 variables:
-  pythonVersion: '3.10.11'  # Specify your Python version
+  pythonVersion: '3.12'  # Specify your Python version
 
 jobs:
 - job: BuildAndDeploy
