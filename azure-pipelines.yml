@@ -1,19 +1,45 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main  # Replace with your main branch name if different
 
 pool:
-  name: 'Self-Hosted-Agent-Pool'  # Update to your self-hosted agent pool name
+  name: 'Self-Hosted-Agent-Pool'  # Replace with your self-hosted agent pool name
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  pythonVersion: '3.9'  # Specify your Python version
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+jobs:
+- job: BuildAndDeploy
+  displayName: 'Build and Deploy Inventory Management Application'
+  steps:
+
+  - checkout: self
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(pythonVersion)'
+      addToPath: true
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: |
+      python run.py
+    displayName: 'Run the application'
+    
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Pipeline.Workspace)/app'  # Adjust as necessary
+      artifact: 'appArtifact'
+      publishLocation: 'pipeline'
+
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'Azure subscription 1 (145b29a3-be32-4c17-ad9c-8f8fb02b04a3)'
+      appType: 'webApp'
+      WebAppName: 'Inventorydbu'
+      package: '$(Pipeline.Workspace)/appArtifact/*.zip'
+      enableCustomDeployment: true
