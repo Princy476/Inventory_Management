@@ -8,6 +8,7 @@ pool:
 
 variables:
   pythonVersion: '3.10'  # Specify your Python version
+  GITHUB_TOKEN: $(GITHUB_TOKEN)
 
 jobs:
 - job: BuildAndDeploy
@@ -20,6 +21,7 @@ jobs:
     inputs:
       versionSpec: '$(pythonVersion)'
       addToPath: true
+      token: $(GITHUB_TOKEN)  # Use the secure GitHub token
 
   - script: |
       python -m pip install --upgrade pip
@@ -29,7 +31,7 @@ jobs:
   - script: |
       python run.py
     displayName: 'Run the application'
-    
+   
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(Pipeline.Workspace)/app'  # Adjust as necessary
