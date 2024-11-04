@@ -31,7 +31,7 @@ jobs:
 
     - task: AzureWebApp@1
       inputs:
-        azureSubscription: 'Azure subscription 1'
+        azureSubscription: 'Azure subscription 1 (145b29a3-be32-4c17-ad9c-8f8fb02b04a3)'
         appName: 'Inventorydbu'
         package: $(System.DefaultWorkingDirectory)/app
       displayName: 'Deploy to Azure Web App'
