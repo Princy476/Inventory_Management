@@ -4,7 +4,7 @@ trigger:
       - main  # Adjust to your branch name if different
 
 pool:
-  name: 'Default'  # Replace with your self-hosted agent's pool name
+  name: 'Default'  # Replace with your self-hosted agent's pool name, or use 'windows-latest' for hosted agents.
 
 jobs:
 - job: BuildAndDeploy
@@ -13,18 +13,18 @@ jobs:
   steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.12.7'
+        versionSpec: '3.10'  # Use an available version, or ensure 3.12.7 is installed on self-hosted agent.
         addToPath: true
 
     - script: |
         python -m venv venv
-        source venv/bin/activate
+        . venv/Scripts/activate  # Use 'source venv/bin/activate' for Linux/macOS agents
         pip install --upgrade pip
         pip install -r requirements.txt
       displayName: 'Install Python dependencies'
 
     - script: |
-        source venv/bin/activate
+        . venv/Scripts/activate  # Use 'source venv/bin/activate' for Linux/macOS agents
         pytest
       displayName: 'Run Tests'
       condition: succeeded()
@@ -33,5 +33,5 @@ jobs:
       inputs:
         azureSubscription: 'Azure subscription 1 (145b29a3-be32-4c17-ad9c-8f8fb02b04a3)'
         appName: 'Inventorydbu'
-        package: $(System.DefaultWorkingDirectory)/app
+        package: '$(System.DefaultWorkingDirectory)/app'
       displayName: 'Deploy to Azure Web App'
