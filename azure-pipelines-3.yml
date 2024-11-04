@@ -4,7 +4,7 @@ trigger:
       - main  # Adjust to your branch name if different
 
 pool:
-  name: 'Self-Hosted-Agent-Pool'  # Replace with your self-hosted agent's pool name
+  name: 'Default'  # Replace with your self-hosted agent's pool name
 
 jobs:
 - job: BuildAndDeploy
@@ -13,7 +13,7 @@ jobs:
   steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.12.7'
+        versionSpec: '3.12'
         addToPath: true
 
     - script: |
