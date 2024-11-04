@@ -8,7 +8,6 @@ pool:
 
 variables:
   pythonVersion: '3.10'  # Specify your Python version
-  GITHUB_TOKEN: $(GITHUB_TOKEN)
 
 jobs:
 - job: BuildAndDeploy
