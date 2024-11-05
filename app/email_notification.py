@@ -35,8 +35,11 @@ def send_email_notification():
                 data=json.dumps(payload)
             )
 
-            if response.status_code == 200:
-                return "Email request sent successfully!"
+           
+            if response.status_code == 200 or response.status_code == 202:
+                 return "Email request sent successfully!"
+
+
             else:
                 return f"Failed to send email request: {response.status_code} - {response.text}"
         except requests.exceptions.RequestException as e:
